@@ -10,7 +10,7 @@ const options = {
 };
 
 class App extends Component {
-  async componentWillMount() {
+  async componentDidMount() {
     await this.loadWeb3();
     await this.loadBlockchainData();
   }
