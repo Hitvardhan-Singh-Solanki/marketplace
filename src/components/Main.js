@@ -51,7 +51,7 @@ class Main extends Component {
         <table className="table">
           <thead>
             <tr>
-              <th scope="col">#</th>
+              {/* <th scope="col">#</th> */}
               <th scope="col">Name</th>
               <th scope="col">Price</th>
               <th scope="col">Owner</th>
@@ -62,7 +62,7 @@ class Main extends Component {
             {this.props.products.map((product, key) => {
               return (
                 <tr key={key}>
-                  <th scope="row">{product.id.toString()}</th>
+                  {/* <th scope="row">{product.id.toString()}</th> */}
                   <td>{product.name}</td>
                   <td>
                     {window.web3.utils.fromWei(

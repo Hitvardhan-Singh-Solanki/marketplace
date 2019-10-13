@@ -78,26 +78,39 @@ class App extends Component {
     this.purchaseProduct = this.purchaseProduct.bind(this);
   }
 
-  async createProduct(name, price) {
+  createProduct(name, price) {
     this.setState({ loading: true });
-    try {
-      await this.state.marketplace.methods
-        .createProduct(name, price)
-        .send({ from: this.state.account })
-        .on("transactionHash", function(hash) {
-          console.log("test", hash);
-        })
-        .on("confirmation", function(confirmationNumber, receipt) {
-          console.log(confirmationNumber, receipt);
-        })
-        .on("receipt", receipt => {
-          this.loadBlockchainData(true);
-          this.setState({ loading: false });
+
+    this.state.marketplace.methods
+      .createProduct(name, price)
+      .send({ from: this.state.account })
+      .on("error", e => {
+        alert(e.stack);
+        this.setState({ loading: false });
+      });
+
+    this.state.marketplace.once(
+      "ProductCreated",
+      null,
+      (error, { returnValues: { id, name, owner, price, purchased } }) => {
+        if (error) {
+          return console.log(error);
+        }
+
+        const newProduct = {
+          id,
+          name,
+          owner,
+          price,
+          purchased
+        };
+
+        this.setState({
+          products: [...this.state.products, newProduct],
+          loading: false
         });
-    } catch (e) {
-      console.log(e);
-      this.setState({ loading: false });
-    }
+      }
+    );
   }
 
   async purchaseProduct(id, price) {
