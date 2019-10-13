@@ -5,6 +5,10 @@ import Marketplace from "../abis/Marketplace.json";
 import Navbar from "./Navbar";
 import Main from "./Main";
 
+const options = {
+  transactionConfirmationBlocks: 1
+};
+
 class App extends Component {
   async componentWillMount() {
     await this.loadWeb3();
@@ -13,7 +17,7 @@ class App extends Component {
 
   async loadWeb3() {
     if (window.ethereum) {
-      window.web3 = new Web3(window.ethereum);
+      window.web3 = new Web3(window.ethereum, null, options);
       window.ethereum.autoRefreshOnNetworkChange = false;
       window.ethereum.on("accountsChanged", () => {
         window.location.reload();
@@ -79,13 +83,16 @@ class App extends Component {
     try {
       await this.state.marketplace.methods
         .createProduct(name, price)
-        .send({ from: this.state.account }, async (error, trxHash) => {
-          if (!error) {
-            await this.loadBlockchainData(true);
-            this.setState({
-              loading: false
-            });
-          }
+        .send({ from: this.state.account })
+        .on("transactionHash", function(hash) {
+          console.log("test", hash);
+        })
+        .on("confirmation", function(confirmationNumber, receipt) {
+          console.log(confirmationNumber, receipt);
+        })
+        .on("receipt", receipt => {
+          this.loadBlockchainData(true);
+          this.setState({ loading: false });
         });
     } catch (e) {
       console.log(e);
